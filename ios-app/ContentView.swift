@@ -1185,7 +1185,7 @@ struct PairingTab: View {
                 if !vm.log.isEmpty {
                     Section {
                         CompactLogView(
-                            title: "Activity Log (\(vm.log.count) lines)",
+                            title: String(format: NSLocalizedString("Activity Log (%d lines)", comment: "Log heading"), vm.log.count),
                             lines: vm.log,
                             onClear: { vm.log.removeAll() }
                         )
@@ -1282,7 +1282,7 @@ struct VPNStatusRow: View {
                         "1. Open LocalDevVPN app and tap Connect.",
                         "2. Return to AirCard-iOS — status indicator turns green."
                     ], id: \.self) { step in
-                        Text(step)
+                        Text(LocalizedStringKey(step))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -1590,7 +1590,7 @@ struct WalletCardsTab: View {
                 Color.clear.frame(height: 60)
             }
             .background(Color(uiColor: .systemGroupedBackground))
-            .navigationTitle("Wallet Cards (\(vm.cards.count))")
+            .navigationTitle(String(format: NSLocalizedString("Wallet Cards (%d)", comment: "Wallet tab title"), vm.cards.count))
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
@@ -1822,7 +1822,7 @@ struct WalletCardsTab: View {
 
             if !vm.cardFlashLog.isEmpty {
                 CompactLogView(
-                    title: "Flash Log (\(vm.cardFlashLog.count) lines)",
+                    title: String(format: NSLocalizedString("Flash Log (%d lines)", comment: "Log heading"), vm.cardFlashLog.count),
                     lines: vm.cardFlashLog,
                     onClear: { vm.cardFlashLog.removeAll() }
                 )
@@ -2000,7 +2000,7 @@ struct PasscodeThemeTab: View {
                 Section {
                     Picker("Mode", selection: $vm.passcodeMode) {
                         ForEach(CreatorMode.allCases) { mode in
-                            Text(mode.rawValue).tag(mode)
+                            Text(LocalizedStringKey(mode.rawValue)).tag(mode)
                         }
                     }
                     .pickerStyle(.segmented)
@@ -2016,7 +2016,7 @@ struct PasscodeThemeTab: View {
                 if !vm.passthmFlashLog.isEmpty {
                     Section {
                         CompactLogView(
-                            title: "Flash Log (\(vm.passthmFlashLog.count) lines)",
+                            title: String(format: NSLocalizedString("Flash Log (%d lines)", comment: "Log heading"), vm.passthmFlashLog.count),
                             lines: vm.passthmFlashLog,
                             onClear: { vm.passthmFlashLog.removeAll() }
                         )
@@ -2240,7 +2240,7 @@ struct PasscodeTargetSection: View {
                         .foregroundColor(.secondary)
                     Picker("System Language", selection: $vm.passcodeLanguageTarget) {
                         ForEach(PasscodeLanguageTarget.allCases) { item in
-                            Text(item.rawValue).tag(item)
+                            Text(LocalizedStringKey(item.rawValue)).tag(item)
                         }
                     }
                     .pickerStyle(.menu)
@@ -2256,7 +2256,7 @@ struct PasscodeTargetSection: View {
                         .foregroundColor(.secondary)
                     Picker("Font Weight / Style", selection: $vm.passcodeBoldTarget) {
                         ForEach(PasscodeBoldTarget.allCases) { item in
-                            Text(item.rawValue).tag(item)
+                            Text(LocalizedStringKey(item.rawValue)).tag(item)
                         }
                     }
                     .pickerStyle(.menu)
@@ -2276,7 +2276,7 @@ struct PasscodeTargetSection: View {
                             .foregroundColor(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
                     } else {
-                        Text("Fast mode selected: only targets \(vm.passcodeLanguageTarget.rawValue) with \(vm.passcodeBoldTarget.rawValue).")
+                        Text(String(format: NSLocalizedString("Fast mode selected: only targets %@ with %@.", comment: "Theme target summary"), NSLocalizedString(vm.passcodeLanguageTarget.rawValue, comment: "Language"), NSLocalizedString(vm.passcodeBoldTarget.rawValue, comment: "Font style")))
                             .font(.caption2)
                             .foregroundColor(.primary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -2307,7 +2307,7 @@ struct ThemeCreatorSection: View {
         Section("Slice Mode") {
             Picker("", selection: $vm.sliceMode) {
                 ForEach(SliceMode.allCases) { m in
-                    Text(m.rawValue).tag(m)
+                    Text(LocalizedStringKey(m.rawValue)).tag(m)
                 }
             }
             .pickerStyle(.segmented)
@@ -2517,7 +2517,7 @@ struct ThemeCreatorSection: View {
                     }
 
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Key \(btn.digit)")
+                        Text(String(format: NSLocalizedString("Key %@", comment: "Passcode button"), btn.digit))
                             .font(.subheadline.weight(.medium))
                         if !btn.letters.isEmpty {
                             Text(btn.letters)

@@ -88,7 +88,7 @@ struct TendiesView: View {
                 if !vm.tendieItems.isEmpty {
                     Section {
                         HStack {
-                            Text("\(vm.tendieItems.count) Wallpapers Imported")
+                            Text(String(format: NSLocalizedString("%d Wallpapers Imported", comment: "Wallpaper count"), vm.tendieItems.count))
                                 .font(.caption.bold())
                                 .foregroundColor(.secondary)
                             Spacer()
@@ -151,7 +151,7 @@ struct TendiesView: View {
                                 HStack(spacing: 8) {
                                     Spacer()
                                     Image(systemName: "sparkles")
-                                    Text("Flash \(selectedCount) Wallpaper\(selectedCount == 1 ? "" : "s")")
+                                    Text(String(format: NSLocalizedString("Flash %d Wallpapers", comment: "Wallpaper action"), selectedCount))
                                     Spacer()
                                 }
                                 .font(.headline)
@@ -190,7 +190,7 @@ struct TendiesView: View {
                 if !vm.tendiesFlashLog.isEmpty {
                     Section {
                         CompactLogView(
-                            title: "Flash Log (\(vm.tendiesFlashLog.count) lines)",
+                            title: String(format: NSLocalizedString("Flash Log (%d lines)", comment: "Log heading"), vm.tendiesFlashLog.count),
                             lines: vm.tendiesFlashLog,
                             onClear: { vm.tendiesFlashLog.removeAll() }
                         )
@@ -283,7 +283,7 @@ struct TendieRowView: View {
                     .lineLimit(1)
 
                 HStack(spacing: 6) {
-                    Text(item.posterType.rawValue)
+                    Text(LocalizedStringKey(item.posterType.rawValue))
                         .font(.caption2.bold())
                         .foregroundColor(item.posterType.badgeColor)
 
@@ -291,7 +291,7 @@ struct TendieRowView: View {
                         .font(.caption2)
                         .foregroundColor(.secondary)
 
-                    Text("\(item.descriptorCount) item\(item.descriptorCount == 1 ? "" : "s")")
+                    Text(String(format: NSLocalizedString("%d items", comment: "Descriptor count"), item.descriptorCount))
                         .font(.caption2)
                         .foregroundColor(.secondary)
                 }
@@ -370,11 +370,11 @@ struct TendieDetailSheet: View {
 
     private func detailRow(title: String, value: String) -> some View {
         HStack {
-            Text(title)
+            Text(LocalizedStringKey(title))
                 .font(.subheadline)
                 .foregroundColor(.secondary)
             Spacer()
-            Text(value)
+            Text(LocalizedStringKey(value))
                 .font(.subheadline.bold())
                 .foregroundColor(.primary)
                 .lineLimit(1)

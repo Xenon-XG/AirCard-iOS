@@ -1,0 +1,6 @@
+"CFBundleDisplayName" = "AirCard-iOS";
+"NSLocalNetworkUsageDescription" = "AirCard-iOS 会在本机广播配对服务，使这台 iPhone 能与自身配对，并连接本地设备服务完成操作。";
+"NSPhotoLibraryUsageDescription" = "AirCard-iOS 需要访问照片，以应用自定义卡片皮肤和锁屏密码主题。";
+"Passcode Theme" = "锁屏密码主题";
+"Pairing File" = "配对文件";
+"PosterBoard Wallpaper" = "PosterBoard 壁纸";
