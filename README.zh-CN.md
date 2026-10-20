@@ -8,8 +8,8 @@
 
 ## 编译与发布
 
-- 推送到 `main`，或在 GitHub Actions 页面手动运行“编译并发布 IPA”，会生成可下载的构建产物。
-- 推送以 `v` 开头的标签（例如 `v1.3.2-zh.1`），工作流还会创建 GitHub Release 并附上 `AirCard-iOS.ipa`。
+- 推送到 `main`，或在 GitHub Actions 页面手动运行“编译并发布 IPA”，会生成构建产物，并自动创建 `v<项目版本>-zh.<运行序号>` Release。
+- 推送以 `v` 开头的标签（例如 `v1.3.2-zh.1`），工作流会使用该标签名创建 GitHub Release，并附上 `AirCard-iOS.ipa`。
 - IPA **未签名**。安装前需使用 SideStore、AltStore 等方式签名；该产物无法直接作为已签名安装包使用。
 - 工作流使用 GitHub 托管的 macOS 运行器和仓库自带的 `AirliftFFI.xcframework`。修改 `rust-core` 后，须先在适用的 macOS/Xcode 环境运行 `./build-ios.sh` 并提交重建的框架，否则 IPA 仍会链接旧版 Rust 库。
 
