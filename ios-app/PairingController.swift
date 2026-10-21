@@ -18,7 +18,7 @@ final class PairingController: ObservableObject {
     private let keepAlive = KeepAlive()
 
     @Published private(set) var running = false
-    @Published var pairingStatus: String = "idle"
+    @Published var pairingStatus: String = ""
     @Published var pairingPIN: String? = nil
 
     /// Path to the pairing file that was actively found or created.
@@ -44,9 +44,9 @@ final class PairingController: ObservableObject {
 
         var errorDescription: String? {
             switch self {
-            case .busy: return "Pairing is already in progress."
-            case .localNetworkDenied: return "Local Network permission is off. Enable it in Settings › AirCard-iOS › Local Network."
-            case .zeroBytes: return "Pairing produced an empty file. Approve the pairing request, then try again."
+            case .busy: return NSLocalizedString("Pairing is already in progress.", comment: "Pairing error")
+            case .localNetworkDenied: return NSLocalizedString("Local Network permission is off. Enable it in Settings › AirCard-iOS › Local Network.", comment: "Pairing error")
+            case .zeroBytes: return NSLocalizedString("Pairing produced an empty file. Approve the pairing request, then try again.", comment: "Pairing error")
             case let .failed(msg): return msg
             }
         }
@@ -136,7 +136,7 @@ final class PairingController: ObservableObject {
         keepAlive.stopAll()
         running = false
         pairingPIN = nil
-        pairingStatus = "Cancelled"
+        pairingStatus = NSLocalizedString("Cancelled", comment: "Pairing status")
         resolve(.failure(CancellationError()))
     }
 
@@ -151,14 +151,14 @@ final class PairingController: ObservableObject {
         keepAlive.stopAll()
         running = true
         pairingPIN = nil
-        pairingStatus = "Starting local host…"
+        pairingStatus = NSLocalizedString("Starting local host…", comment: "Pairing status")
 
         Task {
             _ = await localNetwork.request()
             guard running else { return }
 
             keepAlive.startAudio()
-            pairingStatus = "Broadcasting… open Settings to pair"
+            pairingStatus = NSLocalizedString("Broadcasting… open Settings to pair", comment: "Pairing status")
             runHost()
         }
     }
@@ -203,7 +203,7 @@ final class PairingController: ObservableObject {
                 )
             } else {
                 let msg = cStr(result.error)
-                outcome = .failure(msg.isEmpty ? "pairing failed (rc=\(rc))" : msg)
+                outcome = .failure(msg.isEmpty ? String(format: NSLocalizedString("pairing failed (rc=%d)", comment: "Pairing error"), rc) : msg)
             }
             al_pairing_result_free(&result)
 
@@ -233,14 +233,14 @@ final class PairingController: ObservableObject {
             let canonical = Self.syncCanonicalPairingFile(from: path)
             let size = (try? FileManager.default.attributesOfItem(atPath: canonical)[.size] as? Int) ?? 0
             if size == 0 {
-                pairingStatus = "Failed: empty pairing file"
+                pairingStatus = NSLocalizedString("Failed: empty pairing file", comment: "Pairing status")
                 resolve(.failure(PairingError.zeroBytes))
             } else {
-                pairingStatus = "Paired: \(name) (\(size)B)"
+                pairingStatus = String(format: NSLocalizedString("Paired: %@ (%dB)", comment: "Pairing status"), name, size)
                 resolve(.success(canonical))
             }
         case let .failure(message):
-            pairingStatus = "Failed: \(message)"
+            pairingStatus = String(format: NSLocalizedString("Failed: %@", comment: "Pairing status"), message)
             resolve(.failure(PairingError.failed(message)))
         }
     }
@@ -259,12 +259,12 @@ final class PairingController: ObservableObject {
         service.setTXTRecord(NetService.data(fromTXTRecord: txt))
         service.publish()
         netService = service
-        pairingStatus = "Advertising — open Settings › Privacy & Security › Developer Mode"
+        pairingStatus = NSLocalizedString("Advertising — open Settings › Privacy & Security › Developer Mode", comment: "Pairing status")
     }
 
     fileprivate func presentPin(_ pin: String) {
         pairingPIN = pin
-        pairingStatus = "Enter PIN \(pin) in Settings › Privacy & Security › Developer Mode › Pair with AirCard-iOS"
+        pairingStatus = String(format: NSLocalizedString("Enter PIN %@ in Settings › Privacy & Security › Developer Mode › Pair with AirCard-iOS", comment: "Pairing status"), pin)
     }
 
     private func stopAdvertising() {

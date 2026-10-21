@@ -58,7 +58,7 @@ struct CryptoDonationRow: View {
                 } label: {
                     HStack(spacing: 4) {
                         Image(systemName: isCopied ? "checkmark" : "doc.on.doc.fill")
-                        Text(isCopied ? "Copied!" : "Copy")
+                        Text(LocalizedStringKey(isCopied ? "Copied!" : "Copy"))
                     }
                     .font(.caption.bold())
                     .foregroundStyle(isCopied ? .green : .blue)
@@ -320,7 +320,7 @@ struct CreditsSheet: View {
                     }
                 }
             }
-            .navigationTitle(selectedTab == 0 ? "Credits" : "Donate & Support")
+            .navigationTitle(LocalizedStringKey(selectedTab == 0 ? "Credits" : "Donate & Support"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -742,7 +742,7 @@ struct CompactLogView: View {
                     HStack(spacing: 4) {
                         Image(systemName: copied ? "checkmark" : "doc.on.doc")
                             .font(.system(size: 11, weight: .bold))
-                        Text(copied ? "Copied" : "Copy")
+                        Text(LocalizedStringKey(copied ? "Copied" : "Copy"))
                             .font(.system(size: 11, weight: .bold))
                     }
                     .foregroundStyle(copied ? .green : .blue)
@@ -968,9 +968,9 @@ struct PairingTab: View {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("Not Paired")
                                     .font(.subheadline.bold())
-                                Text(isIOS27OrNewer
+                                Text(LocalizedStringKey(isIOS27OrNewer
                                      ? "Pair on this iPhone below or import a pairing file."
-                                     : "Import a pairing file from SideStore, iLoader, or PC below.")
+                                     : "Import a pairing file from SideStore, iLoader, or PC below."))
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
@@ -1083,7 +1083,7 @@ struct PairingTab: View {
                             VStack(alignment: .leading, spacing: 12) {
                                 HStack(spacing: 8) {
                                     ProgressView().scaleEffect(0.85)
-                                    Text(vm.pairingStatus.isEmpty ? "Starting local pairing host…" : vm.pairingStatus)
+                                    Text(vm.pairingStatus.isEmpty ? NSLocalizedString("Starting local pairing host…", comment: "Pairing status") : vm.pairingStatus)
                                         .font(.subheadline)
                                         .foregroundStyle(.secondary)
                                 }
@@ -1154,7 +1154,7 @@ struct PairingTab: View {
                                         .font(.subheadline.weight(.medium))
                                         .foregroundStyle(
                                             vm.pairingStatus.contains("✅") ? .green :
-                                            vm.pairingStatus.contains("❌") || vm.pairingStatus.contains("failed") ? .red :
+                                            vm.pairingStatus.contains("❌") || vm.pairingStatus.contains(NSLocalizedString("Failed:", comment: "Pairing failure prefix")) ? .red :
                                             .secondary
                                         )
                                         .multilineTextAlignment(.center)
@@ -1168,7 +1168,7 @@ struct PairingTab: View {
                                         Spacer()
                                         Image(systemName: "antenna.radiowaves.left.and.right")
                                             .font(.body.weight(.semibold))
-                                        Text(vm.hasPairingFile ? "Re-Pair This iPhone" : "Pair This iPhone")
+                                        Text(LocalizedStringKey(vm.hasPairingFile ? "Re-Pair This iPhone" : "Pair This iPhone"))
                                             .font(.headline)
                                         Spacer()
                                     }
@@ -1264,11 +1264,11 @@ struct VPNStatusRow: View {
                     .font(.title3)
                     .foregroundStyle(vm.vpnUp ? .green : .orange)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(vm.vpnUp ? "Loopback VPN Active" : "Loopback VPN Not Detected")
+                    Text(LocalizedStringKey(vm.vpnUp ? "Loopback VPN Active" : "Loopback VPN Not Detected"))
                         .font(.subheadline.bold())
-                    Text(vm.vpnUp
+                    Text(LocalizedStringKey(vm.vpnUp
                          ? "RSD tunnel ready — exploit will connect."
-                         : "Connect LocalDevVPN before running flashes.")
+                         : "Connect LocalDevVPN before running flashes."))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -1598,7 +1598,7 @@ struct WalletCardsTab: View {
                     } label: {
                         HStack(spacing: 4) {
                             Image(systemName: vm.isScanningCards ? "stop.circle.fill" : "wave.3.left.circle")
-                            Text(vm.isScanningCards ? "Stop Scan" : "Scan Cards")
+                            Text(LocalizedStringKey(vm.isScanningCards ? "Stop Scan" : "Scan Cards"))
                         }
                         .font(.subheadline.bold())
                         .foregroundStyle(vm.isScanningCards ? .red : .blue)
@@ -1913,7 +1913,7 @@ struct WalletCardsTab: View {
                     HStack(spacing: 6) {
                         Spacer()
                         Image(systemName: vm.isScanningCards ? "stop.circle.fill" : "wave.3.left.circle")
-                        Text(vm.isScanningCards ? "Stop Scan" : "Scan Cards")
+                        Text(LocalizedStringKey(vm.isScanningCards ? "Stop Scan" : "Scan Cards"))
                         Spacer()
                     }
                     .font(.headline)
@@ -2078,7 +2078,7 @@ struct ApplyThemeSection: View {
                 Button {
                     showDocumentPicker = true
                 } label: {
-                    Label(vm.loadedTheme == nil ? "Choose .passthm from Files…" : "Change .passthm…",
+                    Label(LocalizedStringKey(vm.loadedTheme == nil ? "Choose .passthm from Files…" : "Change .passthm…"),
                           systemImage: "doc.badge.plus")
                         .frame(maxWidth: .infinity, alignment: .center)
                 }
@@ -2376,7 +2376,7 @@ struct ThemeCreatorSection: View {
                 Button {
                     showPosterSourceDialog = true
                 } label: {
-                    Label(vm.posterImage == nil ? "Select Photo for Keypad…" : "Change Photo…",
+                    Label(LocalizedStringKey(vm.posterImage == nil ? "Select Photo for Keypad…" : "Change Photo…"),
                           systemImage: "photo")
                         .frame(maxWidth: .infinity, alignment: .center)
                 }
@@ -2434,7 +2434,7 @@ struct ThemeCreatorSection: View {
                             vm.updatePosterSlicing()
                         }
 
-                        Text(vm.maskToCircles ? "Artwork is clipped into individual circular button icons." : "Seamless artwork spans across dialer keys without circular cuts (Adobe Dog style).")
+                        Text(LocalizedStringKey(vm.maskToCircles ? "Artwork is clipped into individual circular button icons." : "Seamless artwork spans across dialer keys without circular cuts (Adobe Dog style)."))
                             .font(.caption2)
                             .foregroundColor(.secondary)
                             .fixedSize(horizontal: false, vertical: true)
@@ -2550,7 +2550,7 @@ struct ThemeCreatorSection: View {
                 }
             }
         }
-        .confirmationDialog("Choose Key \(selectedDigitForPicker ?? "") Image Source", isPresented: $showKeySourceDialog, titleVisibility: .visible) {
+        .confirmationDialog(String(format: NSLocalizedString("Choose Key %@ Image Source", comment: "Image source dialog"), selectedDigitForPicker ?? ""), isPresented: $showKeySourceDialog, titleVisibility: .visible) {
             Button {
                 isKeyPhotosPickerPresented = true
             } label: {

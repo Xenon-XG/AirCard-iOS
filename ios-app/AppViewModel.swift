@@ -215,7 +215,7 @@ final class AppViewModel: ObservableObject {
             refreshPairingFile()
             let display = originalName ?? sourceURL.lastPathComponent
             pairingStatus = String(format: NSLocalizedString("Pairing file loaded ✅ (%@)", comment: "Pairing import status"), display)
-            log.append("Imported pairing file: \(display) (\(data.count) bytes)")
+            log.append(String(format: NSLocalizedString("Imported pairing file: %@ (%d bytes)", comment: "Activity log"), display, data.count))
             return true
         } catch {
             errorMessage = String(format: NSLocalizedString("Failed to save pairing file: %@", comment: "Pairing save error"), error.localizedDescription)
@@ -233,7 +233,7 @@ final class AppViewModel: ObservableObject {
         pairingFileName = exists ? (path as NSString).lastPathComponent : ""
         if exists {
             pairingStatus = String(format: NSLocalizedString("Active: %@ ✅", comment: "Active pairing file"), pairingFileName)
-            log.append("Selected pairing file: \(pairingFileName)")
+            log.append(String(format: NSLocalizedString("Selected pairing file: %@", comment: "Activity log"), pairingFileName))
         }
         scanDocumentsDirectory()
     }
@@ -272,7 +272,7 @@ final class AppViewModel: ObservableObject {
                     self.pairingPhase = .idle
                     self.refreshPairingFile()
                     self.pairingStatus = NSLocalizedString("Paired successfully! ✅", comment: "Pairing status")
-                    self.log.append("Pairing complete: \(path)")
+                    self.log.append(String(format: NSLocalizedString("Pairing complete: %@", comment: "Activity log"), path))
                 }
             } catch is CancellationError {
                 self.pairingPhase = .idle
@@ -308,7 +308,7 @@ final class AppViewModel: ObservableObject {
         hasPairingFile = false
         pairingFileName = ""
         pairingStatus = NSLocalizedString("Pairing file deleted", comment: "Pairing status")
-        log.append("Deleted active pairing credentials")
+        log.append(NSLocalizedString("Deleted active pairing credentials", comment: "Activity log"))
         scanDocumentsDirectory()
     }
 
@@ -402,7 +402,7 @@ final class AppViewModel: ObservableObject {
             isScanningCards = true
             scanStatusText = NSLocalizedString("Open Apple Pay (double-click Side button) and tap your card…", comment: "Scanner instructions")
         }
-        log.append("Started live card scanner…")
+        log.append(NSLocalizedString("Started live card scanner…", comment: "Activity log"))
 
         let pairingPath = PairingController.pairingFilePath()
 
@@ -446,11 +446,11 @@ final class AppViewModel: ObservableObject {
                 if rc != 0 {
                     let msg = errStr ?? "rc=\(rc)"
                     vm.scanStatusText = String(format: NSLocalizedString("Scanner stopped: %@", comment: "Scanner status"), msg)
-                    vm.log.append("❌ Scanner error: \(msg)")
+                    vm.log.append(String(format: NSLocalizedString("❌ Scanner error: %@", comment: "Activity log"), msg))
                     vm.errorMessage = String(format: NSLocalizedString("Card scanner error: %@", comment: "Scanner error"), msg)
                 } else {
                     vm.scanStatusText = String(format: NSLocalizedString("Scanning stopped. Total cards: %d.", comment: "Scanner status"), vm.cards.count)
-                    vm.log.append("Scanning stopped. Total cards: \(vm.cards.count).")
+                    vm.log.append(String(format: NSLocalizedString("Scanning stopped. Total cards: %d.", comment: "Activity log"), vm.cards.count))
                 }
             }
         }
@@ -560,7 +560,7 @@ final class AppViewModel: ObservableObject {
         self.saveCards()
         let netSuffix = network != nil ? " (\(network!.displayName))" : ""
         self.scanStatusText = String(format: NSLocalizedString("Found card: %@%@", comment: "Scanner status"), id, netSuffix)
-        self.log.append("Found card: \(id)\(netSuffix)")
+        self.log.append(String(format: NSLocalizedString("Found card: %@%@", comment: "Activity log"), id, netSuffix))
         UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
     }
 
@@ -739,7 +739,7 @@ final class AppViewModel: ObservableObject {
         errorMessage = nil
 
         if !vpnUp {
-            cardFlashLog.append("⚠️ Notice: Loopback VPN (LocalDevVPN or SideStore WireGuard) is strongly recommended for on-device operations.")
+            cardFlashLog.append(NSLocalizedString("⚠️ Notice: Loopback VPN (LocalDevVPN or SideStore WireGuard) is strongly recommended for on-device operations.", comment: "Flash log"))
         }
 
         let pairingPath = PairingController.pairingFilePath()
@@ -753,7 +753,7 @@ final class AppViewModel: ObservableObject {
                 let safeCardId = cleanId.replacingOccurrences(of: "/", with: "_").replacingOccurrences(of: "+", with: "-")
 
                 await MainActor.run {
-                    self.cardFlashLog.append("[\(i+1)/\(selected.count)] Flashing card \(cleanId.prefix(12))…")
+                    self.cardFlashLog.append(String(format: NSLocalizedString("[%d/%d] Flashing card %@…", comment: "Flash log"), i + 1, selected.count, String(cleanId.prefix(12))))
                     self.cardFlashProgress = Double(i) / total
                 }
 
@@ -766,14 +766,14 @@ final class AppViewModel: ObservableObject {
                 }()
 
                 guard let sourceImg = sourceImg else {
-                    await MainActor.run { self.cardFlashLog.append("  ⚠️ No image for card \(cleanId.prefix(8))") }
+                    await MainActor.run { self.cardFlashLog.append(String(format: NSLocalizedString("  ⚠️ No image for card %@", comment: "Flash log"), String(cleanId.prefix(8)))) }
                     continue
                 }
 
                 // 1. Prepare multi-resolution skins
                 let allSkins = ImageEngine.prepareAllCardSkins(from: sourceImg)
                 guard !allSkins.isEmpty else {
-                    await MainActor.run { self.cardFlashLog.append("  ⚠️ Failed to generate card skins") }
+                    await MainActor.run { self.cardFlashLog.append(NSLocalizedString("  ⚠️ Failed to generate card skins", comment: "Flash log")) }
                     continue
                 }
 
@@ -788,7 +788,7 @@ final class AppViewModel: ObservableObject {
                 let pkpassTarget = "/var/mobile/Library/Passes/Cards/\(cleanId).pkpass"
 
                 await MainActor.run {
-                    self.cardFlashLog.append("  ⚡ Injecting skins into \(cleanId.prefix(10)).pkpass…")
+                    self.cardFlashLog.append(String(format: NSLocalizedString("  ⚡ Injecting skins into %@.pkpass…", comment: "Flash log"), String(cleanId.prefix(10))))
                 }
 
                 var writeOk = false
@@ -820,13 +820,13 @@ final class AppViewModel: ObservableObject {
 
                 if !writeOk {
                     await MainActor.run {
-                        self.cardFlashLog.append("  ❌ Failed to write card skins: \(errDesc ?? "exploit error")")
+                        self.cardFlashLog.append(String(format: NSLocalizedString("  ❌ Failed to write card skins: %@", comment: "Flash log"), errDesc ?? NSLocalizedString("exploit error", comment: "Flash error")))
                     }
                     continue
                 }
 
                 await MainActor.run {
-                    self.cardFlashLog.append("  ✅ Skins applied! Invalidating pass cache…")
+                    self.cardFlashLog.append(NSLocalizedString("  ✅ Skins applied! Invalidating pass cache…", comment: "Flash log"))
                 }
 
                 // 2. Invalidate cache leaves (best effort: some iOS versions don't have .cache or .pkcache folders)
@@ -858,7 +858,7 @@ final class AppViewModel: ObservableObject {
 
                 successCount += 1
                 await MainActor.run {
-                    self.cardFlashLog.append("  ✅ Pass cache invalidated")
+                    self.cardFlashLog.append(NSLocalizedString("  ✅ Pass cache invalidated", comment: "Flash log"))
                     self.cardFlashProgress = Double(i + 1) / total
                 }
             }
@@ -867,12 +867,12 @@ final class AppViewModel: ObservableObject {
                 if successCount > 0 {
                     self.cardFlashPhase = .done(ok: true)
                     self.cardFlashProgress = 1.0
-                    self.cardFlashLog.append("🎉 \(successCount)/\(selected.count) card(s) flashed! Force-close Wallet app to see changes.")
+                    self.cardFlashLog.append(String(format: NSLocalizedString("🎉 %d/%d card(s) flashed! Force-close Wallet app to see changes.", comment: "Flash log"), successCount, selected.count))
                     self.successAlertMessage = String(format: NSLocalizedString("Skins successfully applied to %d card(s)!\n\nImportant Notes:\n• Force-close the Wallet app from the App Switcher (or reboot) to refresh cached card art.\n• Apple Card uses dynamic Metal GPU rendering and cannot have custom static artwork applied.", comment: "Wallet skin success"), successCount)
                     self.showSuccessAlert = true
                 } else {
                     self.cardFlashPhase = .done(ok: false)
-                    self.cardFlashLog.append("❌ Card flash failed. Check connection and try again.")
+                    self.cardFlashLog.append(NSLocalizedString("❌ Card flash failed. Check connection and try again.", comment: "Flash log"))
                 }
             }
         }
@@ -1019,7 +1019,7 @@ final class AppViewModel: ObservableObject {
         syncTargetHostsToRust()
 
         if !vpnUp {
-            passthmFlashLog.append("⚠️ Notice: Loopback VPN (LocalDevVPN or SideStore WireGuard) is strongly recommended for on-device operations.")
+            passthmFlashLog.append(NSLocalizedString("⚠️ Notice: Loopback VPN (LocalDevVPN or SideStore WireGuard) is strongly recommended for on-device operations.", comment: "Flash log"))
         }
 
         let pairingPath = PairingController.pairingFilePath()
@@ -1106,7 +1106,7 @@ final class AppViewModel: ObservableObject {
             try? Data().write(to: stageThemeDir.appendingPathComponent("_big"))
 
             await MainActor.run {
-                self.passthmFlashLog.append("⚡ Staged theme assets (\(targetVer) · \(langs.joined(separator: ", ").uppercased()) · \(targetBold.code)). Injecting into iOS caches…")
+                self.passthmFlashLog.append(String(format: NSLocalizedString("⚡ Staged theme assets (%@ · %@ · %@). Injecting into iOS caches…", comment: "Flash log"), targetVer, langs.joined(separator: ", ").uppercased(), targetBold.code))
                 self.passthmFlashProgress = 0.2
             }
 
@@ -1129,7 +1129,7 @@ final class AppViewModel: ObservableObject {
             for (idx, targetPath) in targetDirs.enumerated() {
                 let targetName = (targetPath as NSString).lastPathComponent
                 await MainActor.run {
-                    self.passthmFlashLog.append("  Writing to \(targetName)…")
+                    self.passthmFlashLog.append(String(format: NSLocalizedString("  Writing to %@…", comment: "Flash log"), targetName))
                 }
 
                 var stepOk = false
@@ -1159,11 +1159,11 @@ final class AppViewModel: ObservableObject {
                 if !stepOk {
                     allOk = false
                     await MainActor.run {
-                        self.passthmFlashLog.append("  ⚠️ Write to \(targetName) failed: \(lastErr ?? "error")")
+                        self.passthmFlashLog.append(String(format: NSLocalizedString("  ⚠️ Write to %@ failed: %@", comment: "Flash log"), targetName, lastErr ?? NSLocalizedString("error", comment: "Flash error")))
                     }
                 } else {
                     await MainActor.run {
-                        self.passthmFlashLog.append("  ✅ Injected into \(targetName)")
+                        self.passthmFlashLog.append(String(format: NSLocalizedString("  ✅ Injected into %@", comment: "Flash log"), targetName))
                     }
                 }
 
@@ -1178,12 +1178,12 @@ final class AppViewModel: ObservableObject {
                 if allOk {
                     self.passthmFlashProgress = 1.0
                     self.passthmFlashPhase = .done(ok: true)
-                    self.passthmFlashLog.append("🎉 Passcode theme applied! Lock your iPhone to see it.")
+                    self.passthmFlashLog.append(NSLocalizedString("🎉 Passcode theme applied! Lock your iPhone to see it.", comment: "Flash log"))
                     self.successAlertMessage = NSLocalizedString("Passcode theme successfully applied!\n\nLock your iPhone (or restart) to see your new passcode keypad.", comment: "Theme success")
                     self.showSuccessAlert = true
                 } else {
                     self.passthmFlashPhase = .done(ok: false)
-                    self.passthmFlashLog.append("❌ One or more theme injections failed.")
+                    self.passthmFlashLog.append(NSLocalizedString("❌ One or more theme injections failed.", comment: "Flash log"))
                 }
             }
         }
@@ -1359,21 +1359,21 @@ final class AppViewModel: ObservableObject {
             )
             tendiesFlashPhase = .done(ok: true)
             tendiesFlashProgress = 1.0
-            tendiesFlashLog.append("🎉 Wallpapers applied successfully!")
-            tendiesFlashLog.append("⚡ Triggering NeoSpring respring...")
+            tendiesFlashLog.append(NSLocalizedString("🎉 Wallpapers applied successfully!", comment: "Flash log"))
+            tendiesFlashLog.append(NSLocalizedString("⚡ Triggering NeoSpring respring...", comment: "Flash log"))
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
                 self?.isNeoSpringing = true
                 RespringHelper.triggerNeoSpring()
             }
         } catch {
-            tendiesFlashLog.append("❌ Error: \(error.localizedDescription)")
+            tendiesFlashLog.append(String(format: NSLocalizedString("❌ Error: %@", comment: "Flash log"), error.localizedDescription))
             tendiesFlashPhase = .done(ok: false)
         }
     }
 
     func respringDevice() {
-        tendiesFlashLog.append("⚡ Triggering NeoSpring respring...")
+        tendiesFlashLog.append(NSLocalizedString("⚡ Triggering NeoSpring respring...", comment: "Flash log"))
         isNeoSpringing = true
         RespringHelper.triggerNeoSpring()
     }

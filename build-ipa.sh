@@ -24,6 +24,11 @@ if [ -z "$APP_PATH" ] || [ ! -d "$APP_PATH" ]; then
     exit 1
 fi
 
+echo "==> Checking Simplified Chinese resources..."
+for resource in Localizable.strings InfoPlist.strings; do
+    test -s "$APP_PATH/zh-Hans.lproj/$resource" || { echo "Missing zh-Hans.lproj/$resource"; exit 1; }
+done
+
 echo "==> Packaging IPA..."
 cp -R "$APP_PATH" build/AirCard-iOS.app
 

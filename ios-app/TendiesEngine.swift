@@ -51,7 +51,7 @@ public final class TendiesEngine {
             throw NSError(
                 domain: "TendiesEngine",
                 code: -1,
-                userInfo: [NSLocalizedDescriptionKey: "Failed to store wallpaper file at \(destinationURL.path)"]
+                userInfo: [NSLocalizedDescriptionKey: String(format: NSLocalizedString("Failed to store wallpaper file at %@", comment: "Wallpaper import error"), destinationURL.path)]
             )
         }
 
@@ -73,7 +73,7 @@ public final class TendiesEngine {
             throw NSError(
                 domain: "TendiesEngine",
                 code: Int(extractRC),
-                userInfo: [NSLocalizedDescriptionKey: "Failed to extract .tendies zip archive (code \(extractRC))"]
+                userInfo: [NSLocalizedDescriptionKey: String(format: NSLocalizedString("Failed to extract .tendies zip archive (code %d)", comment: "Wallpaper import error"), extractRC)]
             )
         }
 
@@ -207,7 +207,7 @@ public final class TendiesEngine {
                         let s = String(cString: p)
                         al_string_free(p)
                         return s
-                    } ?? "Failed to find PosterBoard container"
+                    } ?? NSLocalizedString("Failed to find PosterBoard container", comment: "Wallpaper error")
                     continuation.resume(throwing: NSError(
                         domain: "TendiesEngine",
                         code: Int(rc),
@@ -246,7 +246,7 @@ public final class TendiesEngine {
         progress: @escaping (Double) -> Void
     ) async throws {
         guard !items.isEmpty else {
-            log("⚠️ No wallpapers selected to flash")
+            log(NSLocalizedString("⚠️ No wallpapers selected to flash", comment: "Wallpaper log"))
             return
         }
 
@@ -258,20 +258,20 @@ public final class TendiesEngine {
             throw NSError(
                 domain: "TendiesEngine",
                 code: 1,
-                userInfo: [NSLocalizedDescriptionKey: "PosterBoard Container path is required."]
+                userInfo: [NSLocalizedDescriptionKey: NSLocalizedString("PosterBoard Container path is required.", comment: "Wallpaper error")]
             )
         }
 
         let majorVer = ProcessInfo.processInfo.operatingSystemVersion.majorVersion
         let structVersion = (majorVer <= 16) ? 59 : 61
 
-        log("🚀 Starting PosterBoard injection into \(normalizedContainer)")
-        log("ℹ️ Target PosterBoard structure version: \(structVersion) (iOS \(majorVer))")
+        log(String(format: NSLocalizedString("🚀 Starting PosterBoard injection into %@", comment: "Wallpaper log"), normalizedContainer))
+        log(String(format: NSLocalizedString("ℹ️ Target PosterBoard structure version: %d (iOS %d)", comment: "Wallpaper log"), structVersion, majorVer))
 
         let totalItems = Double(items.count)
 
         for (itemIndex, item) in items.enumerated() {
-            log("\n📦 [\(itemIndex + 1)/\(items.count)] Processing '\(item.name)'…")
+            log(String(format: NSLocalizedString("\n📦 [%d/%d] Processing '%@'…", comment: "Wallpaper log"), itemIndex + 1, items.count, item.name))
 
             let tempStageDir = FileManager.default.temporaryDirectory
                 .appendingPathComponent("tendie_flash_\(UUID().uuidString)")
@@ -286,18 +286,18 @@ public final class TendiesEngine {
                 }
             }
             guard extractRC == 0 else {
-                log("❌ Failed to extract '\(item.name)'")
+                log(String(format: NSLocalizedString("❌ Failed to extract '%@'", comment: "Wallpaper log"), item.name))
                 continue
             }
 
-            log("  🖼 Locating wallpaper descriptors…")
+            log(NSLocalizedString("  🖼 Locating wallpaper descriptors…", comment: "Wallpaper log"))
             let descriptors = findDescriptorsWithExtensions(in: tempStageDir, defaultExt: item.posterType.extensionBundleId)
-            log("  ✨ Found \(descriptors.count) descriptor(s) to install")
+            log(String(format: NSLocalizedString("  ✨ Found %d descriptor(s) to install", comment: "Wallpaper log"), descriptors.count))
 
             for (descIndex, descItem) in descriptors.enumerated() {
                 let targetUUID = UUID().uuidString.uppercased()
                 let randomizedID = Int.random(in: 10000...99999)
-                log("  [\(descIndex + 1)/\(descriptors.count)] Descriptor \(targetUUID) for \(descItem.ext)…")
+                log(String(format: NSLocalizedString("  [%d/%d] Descriptor %@ for %@…", comment: "Wallpaper log"), descIndex + 1, descriptors.count, targetUUID, descItem.ext))
 
                 // Update plist identifiers for templates/videos without suggestionMetadata
                 updatePlistIdentifiers(in: descItem.url, randomizedID: randomizedID)
@@ -336,7 +336,7 @@ public final class TendiesEngine {
         }
 
         // Always force PosterBoard cache refresh and file protections reset
-        log("\n🔄 Forcing PosterBoard cache refresh and file protections reset…")
+        log(NSLocalizedString("\n🔄 Forcing PosterBoard cache refresh and file protections reset…", comment: "Wallpaper log"))
         let stagePrefDir = FileManager.default.temporaryDirectory
             .appendingPathComponent("tendie_pref_\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: stagePrefDir, withIntermediateDirectories: true)
@@ -383,10 +383,10 @@ public final class TendiesEngine {
             pairingPath: pairingPath,
             log: log
         )
-        log("✅ PosterBoard preferences staged for reload")
+        log(NSLocalizedString("✅ PosterBoard preferences staged for reload", comment: "Wallpaper log"))
 
         progress(1.0)
-        log("\n🎉 All wallpapers injected successfully! Open Lock Screen settings or long-press lockscreen to choose your new wallpaper.")
+        log(NSLocalizedString("\n🎉 All wallpapers injected successfully! Open Lock Screen settings or long-press lockscreen to choose your new wallpaper.", comment: "Wallpaper log"))
     }
 
     // MARK: - Tree Writer Helper
@@ -439,7 +439,7 @@ public final class TendiesEngine {
                 targetDir = "\(targetBaseDir)/\(relPath)"
             }
 
-            log("  Writing to \(targetDir)…")
+            log(String(format: NSLocalizedString("  Writing to %@…", comment: "Wallpaper log"), targetDir))
 
             var writeOk = false
             var errDesc: String? = nil
@@ -473,7 +473,7 @@ public final class TendiesEngine {
                 throw NSError(
                     domain: "TendiesEngine",
                     code: 1,
-                    userInfo: [NSLocalizedDescriptionKey: "Failed to write directory: \(errDesc ?? "exploit error")"]
+                    userInfo: [NSLocalizedDescriptionKey: String(format: NSLocalizedString("Failed to write directory: %@", comment: "Wallpaper error"), errDesc ?? NSLocalizedString("exploit error", comment: "Wallpaper error"))]
                 )
             }
         }
@@ -539,7 +539,7 @@ public final class TendiesEngine {
         pairingPath: String,
         log: @escaping (String) -> Void
     ) async throws {
-        log("  📦 Injecting '\(destName)' into \(targetParentDir)…")
+        log(String(format: NSLocalizedString("  📦 Injecting '%@' into %@…", comment: "Wallpaper log"), destName, targetParentDir))
         var errDesc: String? = nil
         let ok: Bool = await withCheckedContinuation { cont in
             DispatchQueue.global(qos: .userInitiated).async {
@@ -579,7 +579,7 @@ public final class TendiesEngine {
             throw NSError(
                 domain: "TendiesEngine",
                 code: 1,
-                userInfo: [NSLocalizedDescriptionKey: "Failed to inject descriptor: \(errDesc ?? "exploit error")"]
+                userInfo: [NSLocalizedDescriptionKey: String(format: NSLocalizedString("Failed to inject descriptor: %@", comment: "Wallpaper error"), errDesc ?? NSLocalizedString("exploit error", comment: "Wallpaper error"))]
             )
         }
     }

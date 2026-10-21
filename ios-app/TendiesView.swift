@@ -54,7 +54,7 @@ struct TendiesView: View {
                         HStack(spacing: 8) {
                             Spacer()
                             Image(systemName: "doc.badge.plus")
-                            Text(vm.tendieItems.isEmpty ? "Choose .tendies from Files…" : "Import More Wallpapers…")
+                            Text(LocalizedStringKey(vm.tendieItems.isEmpty ? "Choose .tendies from Files…" : "Import More Wallpapers…"))
                             Spacer()
                         }
                         .font(.headline)
@@ -92,7 +92,7 @@ struct TendiesView: View {
                                 .font(.caption.bold())
                                 .foregroundColor(.secondary)
                             Spacer()
-                            Button(selectedAll ? "Deselect All" : "Select All") {
+                            Button(LocalizedStringKey(selectedAll ? "Deselect All" : "Select All")) {
                                 let target = !selectedAll
                                 for i in 0..<vm.tendieItems.count {
                                     vm.tendieItems[i].isSelected = target
